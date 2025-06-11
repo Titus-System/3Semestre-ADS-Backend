@@ -1,7 +1,7 @@
 from functools import cache
 import time
 from typing import List, Literal
-from psycopg2 import Error
+from psycopg2 import Error, OperationalError
 from psycopg2.extras import DictCursor
 
 from .dao_utils import build_where
@@ -77,6 +77,48 @@ def busca_top_estado(
         error_logger.error(f"Erro ao buscar ranking dos estados: {str(e)}")
         return None
 
+
+@cache
+def busca_estado_hist(
+        tipo:Literal['exp', 'imp'],
+        estados: tuple[int, ...],
+        paises: tuple[int, ...] = None,
+        anos: tuple[int, ...] | None = None,
+        meses: tuple[int, ...] | None = None,
+        vias: tuple[int, ...] | None = None,
+        urfs: tuple[int, ...] | None = None,
+        ncm: tuple[int, ...] | None = None,
+) -> List[dict] | None:
+    try:
+        with get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                where_statement = build_where(anos=anos, meses=meses, paises=paises, estados=estados, vias=vias, urfs=urfs)
+                where_statement = where_statement.replace('id_estado', 'estado.id_estado')
+                if ncm:
+                    where_statement += f" AND id_produto IN ({', '.join([str(n) for n in ncm])})"
+                
+                query = f"""
+                    SELECT estado.id_estado, estado.nome as nome_estado, estado.sigla,
+                        ano, mes,
+                        SUM(kg_liquido) as kg_liquido_total,
+                        SUM(valor_fob) as valor_fob_total,
+                        CAST(SUM(valor_fob)/NULLIF(SUM(kg_liquido), 0) AS DECIMAL(15,2)) AS valor_agregado_total
+                    FROM estado
+                    LEFT JOIN {tipo}ortacao_estado t ON estado.id_estado = t.id_estado
+                    {where_statement}
+                    GROUP BY estado.id_estado, estado.nome, estado.sigla, ano, mes
+                    ORDER BY ano, mes
+                """
+                inicio = time.time()
+                cur.execute(query)
+                results = [dict(row) for row in cur.fetchall()]
+                fim = time.time()
+                tempo = f"Tempo de execução: {fim - inicio:.4f} segundos"
+                app_logger.info(f"Histórico dos estados {estados}. {tempo}")
+                return results
+    except (Error, OperationalError) as e:
+        error_logger.error(f"Erro ao buscar o histórico de estados no banco de dados: {str(e)}")
+        return None
 
 
 def pesquisa_estado_por_nome(nome: str) -> List[dict] | None:

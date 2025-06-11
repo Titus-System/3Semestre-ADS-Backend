@@ -46,8 +46,8 @@ def get_args(request: Request) -> dict | list:
         errors.append('Quantidade informada deve ser um número inteiro positivo.')
 
     for ano in args.get('anos', ()):
-        if isinstance(ano, int) and ano not in range(2014, 2025):
-            errors.append(f'Ano inválido: {ano}. Utilize um ano entre 2014 e 2024.')
+        if isinstance(ano, int) and ano not in range(2014, 2026):
+            errors.append(f'Ano inválido: {ano}. Utilize um ano entre 2014 e 2025.')
             break
     
     criterios_validos = {'kg_liquido', 'valor_fob', 'valor_agregado', 'registros'}

@@ -17,7 +17,7 @@ def get_dataframe_ncm(tipo:str, ncm:int=None, estado:int=None, pais:int=None) ->
             condicionais.append(f"id_estado = {estado}")
         if pais:
             condicionais.append(f"id_pais = {pais}")
-        where_statement = "WHERE " + "AND ".join(condicionais)
+        where_statement = "WHERE " + " AND ".join(condicionais)
     
     query = f"""
         SELECT ano, mes,
@@ -32,6 +32,9 @@ def get_dataframe_ncm(tipo:str, ncm:int=None, estado:int=None, pais:int=None) ->
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 cur.execute(query)
                 res = [dict(row) for row in cur.fetchall()]
+        print(res)
+        if len(res) < 1:
+            return pd.DataFrame(columns=['DATA', f'valor_fob_{tipo}', f'kg_liquido_{tipo}', f'valor_agregado_{tipo}' ]).fillna(0)
         df = pd.DataFrame(res)
         df[f'valor_fob_{tipo}'] = df[f'valor_fob_{tipo}'].astype(float)
         df[f'kg_liquido_{tipo}'] = df[f'kg_liquido_{tipo}'].astype(float)
@@ -54,17 +57,33 @@ def get_videncia(df:pd.DataFrame, coluna_valor:str):
 
 @cache
 def tendencias_dashboard(ncm: int  = None, estado: str = None, pais: int = None):
+    colunas_padrao = [
+        'DATA',
+        'valor_fob_exp',
+        'kg_liquido_exp',
+        'valor_agregado_exp',
+        'valor_fob_imp',
+        'kg_liquido_imp',
+        'valor_agregado_imp'
+    ]
+
     df_exp = get_dataframe_ncm('exp', ncm, estado, pais)
     df_imp = get_dataframe_ncm('imp', ncm, estado, pais)
 
     if df_exp is None or df_exp.empty:
-        df_exp = pd.DataFrame(columns=['DATA', 'valor_fob_exp', 'kg_liquido_exp', 'valor_agregado_exp'])
+        df_exp = pd.DataFrame(columns=colunas_padrao)
     if df_imp is None or df_imp.empty:
-        df_imp = pd.DataFrame(columns=['DATA', 'valor_fob_imp', 'kg_liquido_imp', 'valor_agregado_imp'])
-    
+        df_imp = pd.DataFrame(columns=colunas_padrao)
+            
     df = pd.concat([df_exp, df_imp], ignore_index=True)
     df = df.groupby('DATA').sum(numeric_only=True).reset_index()
-    df['balanca'] = df['valor_fob_exp'] - df['valor_fob_imp']
+    print("df_concat: ", df)
+
+    for col in colunas_padrao:
+        df[col] = df.get(col, 0)
+    
+    df['balanca'] = df['valor_fob_exp'].fillna(0) - df['valor_fob_imp'].fillna(0)
+
     tendencia_dashboard = {
         'vl_fob_exp': get_videncia(df, 'valor_fob_exp'),
         'vl_fob_imp': get_videncia(df, 'valor_fob_imp'),

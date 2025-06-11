@@ -322,7 +322,7 @@ class BuildDatabase:
 
     def registra_transacoes_estado(self) -> None:
         for tipo in ('exp', 'imp'):
-            for ano in range(2014, 2025):
+            for ano in range(2014, 2026):
                 try:
                     cur = self.conn.cursor()
                     cur.execute(f"SELECT COUNT(*) FROM {tipo}ortacao_estado WHERE ano = {ano}")

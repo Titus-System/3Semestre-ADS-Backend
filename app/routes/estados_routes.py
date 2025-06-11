@@ -5,7 +5,7 @@ from flask_limiter.util import get_remote_address
 
 from ..dao import estado_dao
 from .routes_utils_estados import get_args
-from app.routes import routes_utils_estados
+from app.routes import routes_utils, routes_utils_estados
 
 
 estado_bp = Blueprint('estado', __name__)
@@ -44,7 +44,7 @@ def busca_top_estados():
 @estado_bp.route('/busca_estado_hist', methods=["GET"])
 @limiter.limit('10 per minute')
 def busca_estado_hist():
-    args = get_args(request)
+    args = routes_utils.get_args(request)
 
     if not isinstance(args, dict):
         return jsonify({'error': f'Erro na requisição: {args}'}), 400
@@ -52,18 +52,8 @@ def busca_estado_hist():
     if 'estados' not in args or 'tipo' not in args:
         return jsonify({'error': "Erro na requisição: Parâmetros 'tipo' e 'estados' são obrigatórios."}), 400
 
-    tipos = args['tipo']
-    if isinstance(tipos, str):
-        tipos = [tipos]
-
-    resultados = []
-    for tipo in tipos:
-        args_copia = args.copy()
-        args_copia['tipo'] = tipo
-        resultado = estado_dao.busca_estado_hist(**args_copia)
-        resultados.append({"tipo": tipo, "dados": resultado})
-
-    return routes_utils_estados.return_response(resultados)
+    resultado = estado_dao.busca_estado_hist(**args)
+    return routes_utils_estados.return_response(resultado)
 
 
 @estado_bp.route('/pesquisa_estado_por_nome', methods=["GET"])

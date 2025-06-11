@@ -174,7 +174,7 @@ def busca_hist(tipo:Literal['exp','imp'], estado:int|None=None, pais:int|None=No
             with conn.cursor(cursor_factory=DictCursor) as cur:
                 query = f"""
                     SELECT ano, mes,
-                        SUM(total_{tipo}ortado) as VL_FOB_{tipo.upper()}
+                        SUM(total_{tipo}ortado) as total_valor_fob
                     FROM mv_balanca_comercial
                     {where_statement}
                     GROUP BY ano, mes

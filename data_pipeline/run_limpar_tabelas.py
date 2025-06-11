@@ -3,7 +3,7 @@ import http.client
 
 # limpa_comex_stat.dataframe
 def executar_limpador_ano(ano:int):
-    tipos = ['exp', 'imp', 'exp_mun', 'imp_mun']
+    tipos = ['exp', 'imp'] # + ['exp_mun', 'imp_mun']
     limpador = LimpadorDeTabela()
     resolved = True
     for tipo in tipos:
@@ -22,7 +22,7 @@ def executar_limpador_ano(ano:int):
 
 def start():
     not_resolved = []
-    for ano in range(2014, 2025):
+    for ano in range(2014, 2026):
         operation = executar_limpador_ano(ano)
         if not operation: not_resolved.append(ano)
     

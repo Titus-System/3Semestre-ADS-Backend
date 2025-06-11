@@ -73,6 +73,7 @@ from .bc_routes import balanca_comercial_bp
 from .estados_routes import estado_bp
 from .setores_routes import setores_bp
 from .tendencias_routes import tendencias_bp
+from .urf_routes import urf_bp
 
 all_blueprints = [
     main, 
@@ -83,5 +84,6 @@ all_blueprints = [
     balanca_comercial_bp,
     estado_bp,
     setores_bp,
-    tendencias_bp
+    tendencias_bp,
+    urf_bp
 ]

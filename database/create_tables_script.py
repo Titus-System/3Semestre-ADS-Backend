@@ -174,12 +174,12 @@ CREATE INDEX IF NOT EXISTS idx_ano_mes_pais ON exportacao_estado(ano, mes, id_pa
 CREATE INDEX IF NOT EXISTS idx_ano_mes_estado_imp ON importacao_estado(ano, mes, id_estado);
 CREATE INDEX IF NOT EXISTS idx_ano_mes_pais_imp ON importacao_estado(ano, mes, id_pais);
 CREATE INDEX IF NOT EXISTS idx_produto_ano_mes_imp ON importacao_estado(id_produto, ano, mes);
-CREATE INDEX IF NOT EXISTS idx_ano_mes_municipio_exp ON exportacao_municipio(ano, mes, id_municipio);
-CREATE INDEX IF NOT EXISTS idx_ano_mes_municipio_imp ON importacao_municipio(ano, mes, id_municipio);
 CREATE INDEX IF NOT EXISTS idx_produto_sh4 ON produto(id_sh4);
 CREATE INDEX IF NOT EXISTS idx_produto_sh2 ON produto(id_sh2);
 CREATE INDEX IF NOT EXISTS idx_municipio_estado ON municipio(id_estado);
 CREATE INDEX IF NOT EXISTS idx_pais_bloco ON pais(id_bloco);
+CREATE INDEX IF NOT EXISTS idx_exportacao_estado_ano_mes_tipo ON exportacao_estado (ano, mes, id_estado, id_pais, id_produto);
+CREATE INDEX IF NOT EXISTS idx_importacao_estado_ano_mes_tipo ON importacao_estado (ano, mes, id_estado, id_pais, id_produto);
 
 CREATE EXTENSION IF NOT EXISTS unaccent;
 '''
