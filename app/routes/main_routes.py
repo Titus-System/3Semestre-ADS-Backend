@@ -1,11 +1,20 @@
-from functools import cache
 from flask import Blueprint, json, jsonify, request
-
+import psutil
+import os
 from app.dao import sh4_dao, transacao_dao
 from app.routes import routes_utils
 from ..utils.logging_config import error_logger, app_logger
 
 main = Blueprint ('main', __name__)
+
+@main.route('/memoria')
+def memoria():
+    processo = psutil.Process(os.getpid())
+    mem = processo.memory_info()
+    return jsonify({
+        'rss_MB': round(mem.rss / 1024 / 1024, 2),  # RAM real usada
+        'vms_MB': round(mem.vms / 1024 / 1024, 2),  # Memória virtual
+    })
 
 
 @main.route('/busca_transacao_por_id', methods=['GET'])

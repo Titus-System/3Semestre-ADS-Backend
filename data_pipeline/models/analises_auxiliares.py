@@ -1,4 +1,4 @@
-from functools import cache
+from app import cache
 from typing import Literal
 import pandas as pd
 import numpy as np
@@ -122,7 +122,7 @@ def analise_hhi(
     return dados_json
 
 
-@cache
+@cache.memoize(timeout=60*60*24)
 def gerar_estatisticas_auxiliares_vlfob(ncm:int|None = None, estado:str|None=None, pais:str|None=None):
     """
     Gera todos os dados para o dashboard em um único JSON com todas as análises.

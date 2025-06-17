@@ -1,4 +1,4 @@
-from functools import cache
+from app import cache
 import time
 from typing import List, Literal
 from psycopg2 import Error
@@ -10,7 +10,7 @@ from ..database.database_connection import get_connection
 from ..utils.logging_config import app_logger, error_logger
 
 
-@cache
+@cache.memoize(timeout=60*60*24)
 def busca_top_pais(
         tipo: Literal['exp', 'imp'],
         qtd: int = 10, 
@@ -78,7 +78,7 @@ def busca_top_pais(
         return None
 
 
-@cache
+@cache.memoize(timeout=60*60*24)
 def busca_pais_exp_imp_info(
         paises: tuple[int, ...],
         qtd: int = 10, 
@@ -158,7 +158,7 @@ def busca_pais_exp_imp_info(
         return None
 
 
-@cache
+@cache.memoize(timeout=60*60*24)
 def busca_pais_hist(
         tipo:Literal['exp', 'imp'],
         paises: tuple[int, ...],

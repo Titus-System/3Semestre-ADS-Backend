@@ -1,4 +1,4 @@
-from functools import cache
+from app import cache
 import json
 import os
 from typing import List, Literal
@@ -93,7 +93,7 @@ class Vidente():
         return resultado.to_dict(orient='records')
 
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def tendencia_balanca_comercial(self, 
         estado: str|None = None,
         pais: int|None = None
@@ -117,7 +117,7 @@ class Vidente():
             nome += f"_p{pais}"
         return self.gerar_profecia(df_prophet, nome, f"Previsão de Balança Comercial", "Balança Comercial ($)")
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def regressao_linear_balanca_comercial(self, estado: str | None = None, pais: int | None = None) -> dict:
         df = pd.read_csv("data_pipeline/datasets/dados_agregados/mv_balanca_comercial.csv")
         if estado:
@@ -146,7 +146,7 @@ class Vidente():
         }
     
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def crescimento_mensal_balanca_comercial(self, estado: str | None = None, pais: int | None = None) -> List[dict]:
         df = pd.read_csv("data_pipeline/datasets/dados_agregados/mv_balanca_comercial.csv")
         if estado:
@@ -168,7 +168,7 @@ class Vidente():
         return self.gerar_profecia(df_resultado, nome, "Crescimento Mensal da balança comercial", f"Taxa de crescimento")
 
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def volatilidade_balanca_comercial(self, estado: str | None = None, pais: int | None = None) -> List[dict]:
         df = pd.read_csv("data_pipeline/datasets/dados_agregados/mv_balanca_comercial.csv")
         if estado:
@@ -191,7 +191,7 @@ class Vidente():
 
 
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def tendencia_vlfob(self, 
         tipo: Literal['EXP', 'IMP'],
         estado: str|None = None,
@@ -217,7 +217,7 @@ class Vidente():
         return self.gerar_profecia(df_prophet, nome, f"Previsão de Valor Fob de {tipo}", f"Valor Fob {tipo} ($)")
     
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def crescimento_mensal_vlfob(self, tipo: Literal['EXP', 'IMP'], estado: str | None = None, pais: int | None = None) -> List[dict]:
         df = pd.read_csv("data_pipeline/datasets/dados_agregados/mv_balanca_comercial.csv")
         if estado:
@@ -239,7 +239,7 @@ class Vidente():
         return self.gerar_profecia(df_resultado, nome, "Crescimento Mensal do Valor Fob", f"Taxa de crescimento {tipo}")
 
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def volatilidade_vlfob(self, tipo: Literal['EXP', 'IMP'], estado: str | None = None, pais: int | None = None) -> List[dict]:
         df = pd.read_csv("data_pipeline/datasets/dados_agregados/mv_balanca_comercial.csv")
         if estado:
@@ -261,7 +261,7 @@ class Vidente():
         return self.gerar_profecia(df_resultado, nome, "Volatilidade de Valor FOB", f"Volatiliade {tipo}")
 
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def regressao_linear_vlfob(self, tipo: Literal['EXP', 'IMP'], estado: str | None = None, pais: int | None = None) -> dict:
         df = pd.read_csv("data_pipeline/datasets/dados_agregados/mv_balanca_comercial.csv")
         if estado:
@@ -290,7 +290,7 @@ class Vidente():
         }
 
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def tendencia_valor_agregado(self, tipo:Literal['EXP', 'IMP'], estado:str|None = None, pais:int|None = None) -> List[dict]:
         app_logger.info(f"Iniciando análise de tendência de Valor Agregado de {tipo}")
         df = pd.read_csv("data_pipeline/datasets/dados_agregados/mv_balanca_comercial.csv")
@@ -317,7 +317,7 @@ class Vidente():
         return self.gerar_profecia(df_prophet, nome, f"Previsão de Valor Agregado médio de {tipo}", f"Valor Agregado médio {tipo} ($)")
 
 
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def tendencia_vlfob_ncm(self, tipo: Literal['EXP', 'IMP'], ncm: str) -> List[dict]:
         app_logger.info(f"Iniciando análise de tendência de VL_FOB por NCM {ncm} usando novo CSV")
         
@@ -340,7 +340,7 @@ class Vidente():
 
         return self.gerar_profecia(df_prophet, nome, f"Previsão de Valor FOB ({tipo}) - NCM {ncm}", f"Valor FOB {tipo} ($)")
     
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def tendencia_vlfob_sh4(self, tipo: Literal['EXP', 'IMP'], sh4: str) -> List[dict]:
         app_logger.info(f"Iniciando análise de tendência de VL_FOB por SH4 {sh4} usando mv_sh4_mensal")
 
@@ -359,7 +359,7 @@ class Vidente():
 
         return self.gerar_profecia(df_prophet, nome, f"Previsão de Valor FOB ({tipo}) - SH4 {sh4}", f"Valor FOB {tipo} ($)")
     
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def tendencia_vlfob_setores(self, tipo: Literal['EXP', 'IMP'], setor: str) -> List[dict]:
         app_logger.info(f"Iniciando análise de tendência de VL_FOB por setor '{setor}' usando mv_setores_mensal")
 
@@ -376,7 +376,7 @@ class Vidente():
         return self.gerar_profecia(df_prophet, nome, f"Previsão de Valor FOB ({tipo}) - Setor {setor.title()}", f"Valor FOB {tipo} ($)")
 
     
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def tendencia_ranking_ncm(self, tipo: Literal['EXP', 'IMP']) -> List[dict]:
         caminho = (
             "data_pipeline/datasets/dados_agregados/mv_ncm_mensal_exp.csv"
@@ -396,7 +396,7 @@ class Vidente():
 
         return df_resultado.to_dict(orient='records')
     
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def tendencia_ranking_sh4(self, tipo: Literal['EXP', 'IMP']) -> List[dict]:
         caminho_csv = "data_pipeline/datasets/dados_agregados/mv_sh4_mensal.csv"
         df = pd.read_csv(caminho_csv)
@@ -412,7 +412,7 @@ class Vidente():
         return df_resultado.to_dict(orient='records')
 
     # busca os ncm que mais aumentaram/diminuiram exportacao/importacao na série histórica
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def maiores_evolucoes_ncm(self, tipo: Literal['EXP', 'IMP']) -> dict:
         caminho = (
             "data_pipeline/datasets/dados_agregados/mv_ncm_mensal_exp.csv"
@@ -432,7 +432,7 @@ class Vidente():
         }
     
     # busca os sh4 que mais aumentaram/diminuiram exportacao/importacao na série histórica
-    @cache
+    @cache.memoize(timeout=60*60*24)
     def maiores_evolucoes_sh4(self, tipo: Literal['EXP', 'IMP']) -> dict:
         caminho = "data_pipeline/datasets/dados_agregados/mv_sh4_mensal.csv"
         df = pd.read_csv(caminho)

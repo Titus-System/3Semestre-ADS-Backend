@@ -1,4 +1,4 @@
-from functools import cache
+from app import cache
 from typing import List, Literal
 from psycopg2 import Error, OperationalError
 from psycopg2.extras import DictCursor
@@ -62,7 +62,7 @@ def busca_transacao_por_id(id_transacao:int, tipo:Literal['imp', 'exp']):
         return None
 
 
-@cache
+@cache.memoize(timeout=60*60*24)
 def info_geral(
     tipo: Literal['imp', 'exp'],
     ncm: int = None,
@@ -141,7 +141,7 @@ def build_query_hhi(
     return query
 
 
-@cache
+@cache.memoize(timeout=60*60*24)
 def busca_dados_para_analise_hhi(tipo:Literal['exp','imp'], crit:Literal['pais', 'estado', 'ncm'], ncm:int, estado:int|None=None, pais:int|None=None) -> List[dict]:    
     print("iniciando busca no banco de dados para dados de hhi")
     try:
@@ -158,7 +158,7 @@ def busca_dados_para_analise_hhi(tipo:Literal['exp','imp'], crit:Literal['pais',
         return None
 
 
-@cache
+@cache.memoize(timeout=60*60*24)
 def busca_hist(tipo:Literal['exp','imp'], estado:int|None=None, pais:int|None=None) -> List[dict]:
     try:
         where_statement = ""
@@ -187,6 +187,7 @@ def busca_hist(tipo:Literal['exp','imp'], estado:int|None=None, pais:int|None=No
         return None
     
 
+@cache.memoize(timeout=60*60*24)
 def hist_geral(
     tipo: Literal['imp', 'exp'],
     ncm: int = None,

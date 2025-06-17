@@ -1,4 +1,4 @@
-from functools import cache
+from app import cache
 from typing import List, Literal
 import pandas as pd
 
@@ -18,10 +18,14 @@ def hist_sh4 (df:pd.DataFrame, tipo:str, crit=Literal['KG_LIQUIDO', 'VL_FOB', 'b
     df_prophet['y'] = pd.to_numeric(df_prophet['y'], errors='coerce') 
     return df_prophet
 
-@cache
+
+@cache.memoize(timeout=60*60*24)
 def tendencia_sh4(sh4: List[str], estado: List[int] = None, pais: List[int] = None):
     tendencia_dashboard = {}
     vidente = Vidente()  # Supondo que essa classe implemente .gerar_profecia_json()
+
+    estado = (estado,) if estado else None
+    pais = (pais,) if pais else None
     print("Argumentos recebidos:")
     print("sh4:", sh4)
     print("estado:", estado)
@@ -41,11 +45,26 @@ def tendencia_sh4(sh4: List[str], estado: List[int] = None, pais: List[int] = No
         'total_valor_agregado': 'valor_agregado_IMP'
     }, inplace=True)
 
+    colunas_comuns = ['ano', 'mes', 'id_sh4', 'descricao']
+    colunas_exp = colunas_comuns + ['VL_FOB_EXP', 'KG_LIQUIDO_EXP', 'valor_agregado_EXP']
+    colunas_imp = colunas_comuns + ['VL_FOB_IMP', 'KG_LIQUIDO_IMP', 'valor_agregado_IMP']
+    # Se estiver vazio, criar DataFrame com colunas esperadas
+    if df_exp.empty:
+        df_exp = pd.DataFrame(columns=colunas_exp)
+
+    if df_imp.empty:
+        df_imp = pd.DataFrame(columns=colunas_imp)
+
+    
+    print(df_exp)
+    print(df_imp)
+
     df = pd.merge(df_exp, df_imp, on=['ano', 'mes', 'id_sh4', 'descricao'], how='outer')
     df['ano'] = df['ano'].astype(int)
     df['mes'] = df['mes'].astype(int)
 
     df['DATA'] = pd.to_datetime(df['ano'].astype(str) + '-' + df['mes'].astype(str).str.zfill(2))
+    df = df.fillna(0)
     df = df.groupby('DATA').agg({
         'VL_FOB_EXP': 'sum',
         'VL_FOB_IMP': 'sum',

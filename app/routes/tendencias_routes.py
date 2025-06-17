@@ -122,6 +122,7 @@ def estatisticas_auxiliares_vlfob():
 @tendencias_bp.route('/busca_tendencias_dashboard', methods=['GET'])
 def busca_tendencia_sh4():
     args = routes_utils.get_args(request)
+    print("args",args)
     if not isinstance(args, dict):
         return jsonify({'error': f'Erro na requisição: {args}'}), 400
 

@@ -1,0 +1,13 @@
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+.env
+*.env
+.git
+*.pem
+node_modules/
+logs/
+datasets/

@@ -5,8 +5,9 @@ from app.dao.dao_utils import build_where
 from app.database.database_connection import get_connection
 from psycopg2.extras import DictCursor
 from app.utils.logging_config import app_logger, error_logger
+from app import cache
 
-
+@cache.memoize(timeout=60*60*24)
 def busca_balanca_comercial(
         anos: List[int] = None,
         meses: List[int] = None,

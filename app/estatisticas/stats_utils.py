@@ -6,7 +6,7 @@ from psycopg2.extras import DictCursor
 from app.dao.dao_utils import build_where
 from app.database.database_connection import get_connection
 from app.utils.logging_config import app_logger, error_logger
-
+from app import cache
 
 
 def filtrar_df(
@@ -76,6 +76,7 @@ def historico_vlfob_dataframe(tipo:str, ncm:List[int]=None, estados:List[int]=No
     return df if len(df) > 0 else pd.DataFrame(columns=['DATA', f'valor_fob_{tipo}'])
 
 
+# @cache.memoize(timeout=60*60*24)
 def historico_imp_exp_dataframe(ncm:List[int]=None, estados:List[int]=None, paises:List[int]=None):
     hist_exp = historico_vlfob_dataframe("exp", ncm, estados, paises)
     hist_imp = historico_vlfob_dataframe("imp", ncm, estados, paises)
@@ -85,6 +86,7 @@ def historico_imp_exp_dataframe(ncm:List[int]=None, estados:List[int]=None, pais
     return hist
     
 
+# @cache.memoize(timeout=60*60*24)
 def historico_balanca_dataframe(ncm:List[int]=None, estados:List[int]=None, paises:List[int]=None) -> pd.DataFrame:
     hist_exp = historico_vlfob_dataframe("exp", ncm, estados, paises)
     hist_imp = historico_vlfob_dataframe("imp", ncm, estados, paises)
